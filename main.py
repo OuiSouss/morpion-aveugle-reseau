@@ -2,8 +2,9 @@
 
 from grid import *
 import  random
-
+from run import select_mode
 def main():
+    #add function to select/create server/client
     grids = [grid(), grid(), grid()]
     current_player = J1
     grids[J1].display()
