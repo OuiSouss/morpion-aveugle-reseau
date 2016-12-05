@@ -16,6 +16,11 @@ def run_server():
     s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     s.bind(("",7777))
     s.listen(2)
+    players = []
+    
+    while True:
+        (s2,addr) = s.accept()
+        print("Conection :", addr)
 
 def run_client(host):
     
