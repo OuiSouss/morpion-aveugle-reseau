@@ -1,10 +1,16 @@
+
 #!/usr/bin/python3
 
 from grid import *
 import  random
 from run import select_mode
-def main():
+import sys
+
+def main(argv):
     #add function to select/create server/client
+    select_mode(argv)
+            
+    
     grids = [grid(), grid(), grid()]
     current_player = J1
     grids[J1].display()
@@ -32,4 +38,10 @@ def main():
     else:
         print("you loose !")
 
-main()
+if __name__ == "__main__":
+    try:
+        host = sys.argv[1]
+    except IndexError:
+        host = ""
+    main(host)
+    sys.exit(0)
