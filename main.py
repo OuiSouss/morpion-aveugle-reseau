@@ -9,8 +9,12 @@ import sys
 def main(argv):
     #add function to select/create server/client
     select_mode(argv)
-            
-    
+
+    """ grids est un tableau pour chaque vue
+        grids[0] : vue observateur
+        grids[1] : joueur numéro 1 premier connecté
+        grids[2] : joueur numéro 2 deuxième connecté
+    """
     grids = [grid(), grid(), grid()]
     current_player = J1
     grids[J1].display()

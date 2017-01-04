@@ -16,6 +16,7 @@ def run_server():
     s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     s.bind(("",7777))
     s.listen(2)
+    print("Wait connection ...")
     players = []
     
     while True:
