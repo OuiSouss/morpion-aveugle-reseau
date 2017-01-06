@@ -40,7 +40,7 @@ def play(data,player):
         current_player = current_player%2 + 1
     print("au tour de " + str(current_player))
 
-def main():
+def main_s():
     s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM,0)
     s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     s.bind(("",7777))
