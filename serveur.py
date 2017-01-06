@@ -12,7 +12,7 @@ def main():
     s.bind(("",7777))
     print("Serveur pret\n")
     print("Wait connection ...\n")
-    s.listen(2)
+    s.listen(10)
     players = []
     players.append(s)
 
@@ -24,7 +24,12 @@ def main():
         print("Conection :", addr)
         players.append(s2)
         if len(players) >= 3:
-            if current_play
+            print("il y a assez de joueurs connectés pour lancer le jeu")
+            #envoyer les vues a chaque joueur
+            players[1].send(str.encode(grids[J1].displayStr()))
+            players[2].send(str.encode(grids[J2].displayStr()))
+            for i in range(3, len(players)):
+                players[i].send(str.encode(grids[0].displayStr()))
     for p in players:
         p.close()
     s.close()

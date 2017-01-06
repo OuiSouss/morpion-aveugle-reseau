@@ -18,15 +18,14 @@ def main(host):
     s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     s.connect((host,7777))
 
-    data = s.recv(1024)
+    data = bytes.decode(s.recv(1024))
     shot = -1
     if data == "turn":
         shot = selectCase()
         s.send(str(shot))
-    data = None
-    else:
-        if(len(data) != 0):
-            print(data)
+        data = None
+    elif len(data) != 0:
+        print(str(data))
     s.close()
 
 
