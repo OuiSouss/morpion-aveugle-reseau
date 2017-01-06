@@ -20,14 +20,14 @@ def main(host):
     s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
     s.connect((host,7777))
     while True:
-        data = bytes.decode(s.recv(1024))
+        data = str(bytes.decode(s.recv(1024)))
         shot = -1
         if data == "turn":
             shot = selectCase()
             s.send(str.encode(str(shot)))
             data = None
         elif len(data) != 0:
-            print(str(data))
+            print(data)
 
 
 
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     try:
         host = sys.argv[1]
     except IndexError:
-        print ("probleme d'argument sans argument c'est le serveur avec le client")
+        print ("probleme d'argument sans argument c'est le serveur à lancer")
         sys.exit(1)
     main(host)
 

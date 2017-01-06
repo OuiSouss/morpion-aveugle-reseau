@@ -11,7 +11,9 @@ import socket
 """
 def turn(player1,player2):
     global current_player
-    if current_player == J1:
+    if player1==None or player2==None:
+        return
+    elif current_player == J1:
         player1.send(str.encode("turn"))
     else:
         player2.send(str.encode("turn"))
@@ -21,7 +23,7 @@ def turn(player1,player2):
     data is the data received after choise of the client
     player is the socket of the current player
 """
-def play(data,player, players):
+def play(data,player):
     global current_player, grids
     shot = int(bytes.decode(data))
     #case not free
@@ -35,9 +37,8 @@ def play(data,player, players):
         grids[current_player].cells[shot] = current_player
         grids[0].play(current_player,shot)
         player.send(str.encode(grids[current_player].displayStr()))
-        for i in range (3, len(players)):
-            players[i].send(str.encode(grids[0].displayStr()))
         current_player = current_player%2 + 1
+    print("au tour de " + str(current_player))
 
 def main():
     s = socket.socket(socket.AF_INET6, socket.SOCK_STREAM,0)
@@ -45,58 +46,63 @@ def main():
     s.bind(("",7777))
     print("Serveur pret\n")
     print("Wait connection ...\n")
-    s.listen(10)
+    s.listen(2)
     players = []
     players.append(s)
     global current_player, grids
     grids = [grid(),grid(),grid()]
     current_player = J1
-        
+    s_player1 = None
+    s_player2 = None
     while grids[0].gameOver() == -1:
-        (s2,addr) = s.accept()
-        print("Conection :", addr)
-        players.append(s2)
-        if len(players) >= 3:
-            print("il y a assez de joueurs connectés pour lancer le jeu")
-            #envoyer les vues a chaque joueur et observateurs
-            players[1].send(str.encode(grids[J1].displayStr()))
-            players[2].send(str.encode(grids[J2].displayStr()))
-            for i in range(3, len(players)):
-                players[i].send(str.encode(grids[0].displayStr()))
-            for i in range (1,3):
-                turn(players[J1],players[J2])
-                data_recv_client = players[i].recv(1024)
-                if len(data_recv_client) == 0:
-                    #we suppose its because one of the player is disconnected
-                    #closing the server
-                    s.close()
-                #turn of player 1
-                elif players[i] == players[J1] and current_player == J1:
-                    play(data_recv_client,players[i], players)
-                #turn of player 2
-                elif players[i] == players[J2] and current_player == J2:
-                    play(data_recv_client,players[i], players)
-                        
+        for p in players:
+            if p == s :
+                if s_player1 == None or s_player2 == None:
+                    print("il manque des joueurs")
+                    (s2,addr) = s.accept()
+                    if s_player1 == None:
+                        print("Conection :", addr)
+                        s_player1 = s2
+                        players.append(s_player1)                        
+                        s_player1.send(str.encode(grids[J1].displayStr()))
+                    else:
+                        print("Connection: ", addr)
+                        s_player2 = s2
+                        players.append(s_player2)
+                        s_player2.send(str.encode(grids[J2].displayStr()))
+                        print("on peut commencer")
+                        turn(s_player1,s_player2)
+                else:
+                        s2.send(str.encode("pas de joueur ou d'observateur en plus accepter"))
+            else:
+                if s_player1 != None and s_player2 != None:
+                    data_recv_client = p.recv(1024)
+                    if len(data_recv_client) == 0:
+                        #we suppose its because one of the player is disconnected
+                        #closing the server
+                        s.close()
+                    #turn of player 1
+                    elif p == s_player1 and current_player == J1:
+                        play(data_recv_client,p)
+                    #turn of player 2
+                    elif p == s_player2 and current_player == J2:
+                        play(data_recv_client,p)
+                    turn(s_player1,s_player2)
+                            
 
 
     # Game end     
-    for p in players:
-        p.send(str.encode("GAME OVER!!!"))
-        p.send(str.encode(grids[0].displayStr()))
-        p.close()
     if grids[0].gameOver() == J1:
-        players[J1].send(str.encode("You Win!!!"))
-        players[J2].send(str.encode("You Loose!!!"))
-        for i in range(3, len(players)):
-            players[i].send(str.encode("Player 1 win against player 2 !!!"))
+        s_player1.send(str.encode("You Win!!!"))
+        s_player2.send(str.encode("You Loose!!!"))
     elif grids[0].gameOver() == J2:
-        players[J1].send(str.encode("You Loose!!!"))
-        players[J2].send(str.encode("You Win!!!"))
-        for i in range(3, len(players)):
-            players[i].send(str.encode("Player 2 win against player 1 !!!"))
+        s_player1.send(str.encode("You Loose!!!"))
+        s_player2.send(str.encode("You Win!!!"))
     else:
         for p in players:
             p.send(str.encode("Draw!!!"))
+    s_player1.close()
+    s_player2.close()
     s.close()
-
-main()
+if __name__ == "__main__":
+    main()
