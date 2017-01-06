@@ -34,7 +34,10 @@ class grid:
         for i in range(3):
             print("|",symbols[self.cells[i*3]], "|",  symbols[self.cells[i*3+1]], "|",  symbols[self.cells[i*3+2]], "|");
             print("-------------")
-
+    
+    """ Display the state of the game
+        return grid_str a string of the state of the game
+    """
     def displayStr(self):
         grid_str = "-------------\n"
         for i in range(3):
